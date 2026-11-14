@@ -62,8 +62,10 @@ changes should create a new run so results remain interpretable.
 
 ## Proposed milestones
 
-1. Implement the NumPy network and verify forward propagation and parameter
-   serialization.
+1. Complete: implement the NumPy network and verify forward propagation and
+   parameter serialization. Includes configurable layers and activations,
+   seeded initialization, single/batch inference, independent genomes, and
+   versioned JSON-compatible snapshots.
 2. Implement deterministic course geometry, movement, sensors, collisions, and
    episode evaluation.
 3. Implement evolution and demonstrate improvement over an initial population

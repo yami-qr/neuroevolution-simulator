@@ -1,14 +1,24 @@
 """A feed-forward controller implemented with NumPy matrix operations."""
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from numbers import Integral
-from typing import Literal
+from typing import Literal, TypedDict
 
 import numpy as np
 from numpy.typing import ArrayLike, NDArray
 
 ActivationName = Literal["tanh", "relu", "sigmoid", "linear"]
 FloatArray = NDArray[np.float64]
+
+
+class NetworkState(TypedDict):
+    """JSON-compatible controller snapshot, including the genome's meaning."""
+
+    format_version: int
+    layer_sizes: list[int]
+    hidden_activation: ActivationName
+    output_activation: ActivationName
+    genome: list[float]
 
 
 def _sigmoid(values: FloatArray) -> FloatArray:
@@ -174,3 +184,109 @@ class FeedForwardNetwork:
                 "Forward propagation overflowed; scale inputs or parameters."
             ) from error
         return values
+
+    def to_genome(self) -> FloatArray:
+        """Return an independent vector of all parameters in a stable order.
+
+        For each layer, append its row-major flattened weights, then its biases.
+        A genome must be paired with its layer sizes and activation names when
+        persisted; to_dict includes this metadata.
+        """
+        return np.concatenate(
+            [
+                array.ravel()
+                for pair in zip(self._weights, self._biases, strict=True)
+                for array in pair
+            ]
+        )
+
+    def set_genome(self, genome: ArrayLike) -> None:
+        """Import a finite parameter vector without retaining shared memory."""
+        vector = _as_finite_array(genome, name="Genome")
+        if vector.ndim != 1 or vector.size != self.parameter_count:
+            raise ValueError(
+                f"Genome must have shape ({self.parameter_count},), got {vector.shape}."
+            )
+
+        weights = []
+        biases = []
+        offset = 0
+        for layer_weights, layer_biases in zip(
+            self._weights, self._biases, strict=True
+        ):
+            end = offset + layer_weights.size
+            weights.append(vector[offset:end].reshape(layer_weights.shape))
+            offset = end
+            end = offset + layer_biases.size
+            biases.append(vector[offset:end])
+            offset = end
+        self.set_parameters(weights, biases)
+
+    @classmethod
+    def from_genome(
+        cls,
+        layer_sizes: Sequence[int],
+        genome: ArrayLike,
+        *,
+        hidden_activation: ActivationName = "tanh",
+        output_activation: ActivationName = "tanh",
+    ) -> "FeedForwardNetwork":
+        """Build a controller from an independent copy of existing parameters."""
+        network = cls(
+            layer_sizes,
+            seed=0,
+            hidden_activation=hidden_activation,
+            output_activation=output_activation,
+        )
+        network.set_genome(genome)
+        return network
+
+    def copy(self) -> "FeedForwardNetwork":
+        """Clone a controller with no shared parameter arrays."""
+        return self.from_genome(
+            self.layer_sizes,
+            self.to_genome(),
+            hidden_activation=self.hidden_activation,
+            output_activation=self.output_activation,
+        )
+
+    def to_dict(self) -> NetworkState:
+        """Return a versioned snapshot suitable for json.dumps or persistence."""
+        return {
+            "format_version": 1,
+            "layer_sizes": list(self.layer_sizes),
+            "hidden_activation": self.hidden_activation,
+            "output_activation": self.output_activation,
+            "genome": self.to_genome().tolist(),
+        }
+
+    @classmethod
+    def from_dict(cls, state: Mapping[str, object]) -> "FeedForwardNetwork":
+        """Restore a snapshot and reject unsupported or malformed state."""
+        required = {
+            "format_version",
+            "layer_sizes",
+            "hidden_activation",
+            "output_activation",
+            "genome",
+        }
+        if not isinstance(state, Mapping) or not required.issubset(state):
+            raise ValueError("Network snapshot is missing required fields.")
+        if type(state["format_version"]) is not int or state["format_version"] != 1:
+            raise ValueError("Unsupported network snapshot format_version.")
+        if not isinstance(state["layer_sizes"], list):
+            raise ValueError(
+                "Snapshot layer_sizes must be a list of positive integers."
+            )
+        if not isinstance(state["hidden_activation"], str) or not isinstance(
+            state["output_activation"], str
+        ):
+            raise ValueError("Snapshot activation names must be strings.")
+        if not isinstance(state["genome"], list):
+            raise ValueError("Snapshot genome must be a list of finite numbers.")
+        return cls.from_genome(
+            state["layer_sizes"],
+            state["genome"],
+            hidden_activation=state["hidden_activation"],
+            output_activation=state["output_activation"],
+        )

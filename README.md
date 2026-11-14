@@ -75,3 +75,33 @@ uses a local seed; inference leaves the network and inputs unchanged.
 
 The batch evaluates many observations using **one network**. A population of
 agents with different genomes will use separate controllers.
+
+### Genomes and snapshots
+
+```python
+import json
+
+genome = network.to_genome()  # Independent float64 array, shape (158,).
+child = network.copy()
+genome[0] += 0.1
+child.set_genome(genome)  # The original controller is unchanged.
+
+encoded = json.dumps(child.to_dict(), allow_nan=False)
+restored = FeedForwardNetwork.from_dict(json.loads(encoded))
+```
+
+The genome order is each layer's weights flattened in row-major order, followed
+by that layer's biases. Import and export copy parameters so parent controllers
+and offspring cannot accidentally share mutable arrays. Invalid lengths,
+shapes, and non-finite parameters are rejected before updating a controller.
+
+Snapshots include a format version, layer sizes, activation names, and the
+complete genome. Saving only a seed is not enough to preserve an evolved
+controller. Seeds reproduce initialization in the same NumPy environment;
+snapshots store the actual parameters.
+
+Run the example:
+
+```powershell
+.\.venv\Scripts\python.exe examples/network_demo.py
+```
