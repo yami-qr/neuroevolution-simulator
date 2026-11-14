@@ -9,6 +9,7 @@ from neuroevolution.agent import (
 )
 from neuroevolution.course import Circle, Course, Rectangle, slalom_course
 from neuroevolution.episode import EpisodeResult, run_episode
+from neuroevolution.evolution import EvolutionRunner, GenerationResult, GenerationStats
 from neuroevolution.fitness import FitnessBreakdown, FitnessConfig, score_episode
 from neuroevolution.genetics import (
     EvolutionConfig,
@@ -28,9 +29,12 @@ __all__ = [
     "Course",
     "EpisodeResult",
     "EvolutionConfig",
+    "EvolutionRunner",
     "FeedForwardNetwork",
     "FitnessBreakdown",
     "FitnessConfig",
+    "GenerationResult",
+    "GenerationStats",
     "Rectangle",
     "RayReading",
     "SensorConfig",

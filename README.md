@@ -6,8 +6,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 ## Status
 
 Neural controllers, deterministic course geometry, fixed-step movement, sensors,
-bounded controller episodes, and fitness scoring are implemented and tested.
-The dashboard and evolution are planned.
+bounded controller episodes, fitness scoring, and generation evolution are
+implemented and tested. The dashboard is planned.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -200,8 +200,8 @@ Run the headless course demonstration:
 
 It shows a scripted reference route through all checkpoints, then evaluates an
 untrained seeded network. The reference demonstrates that the course is
-traversable; it is not a learned solution. Evolution and fitness selection will
-be implemented in the next milestone.
+traversable; it is not a learned solution. The separate evolution runner breeds
+neural controllers using these same episodes.
 
 ## Fitness scoring
 
@@ -234,3 +234,37 @@ All parents must share architecture and activation names. Negative and tied
 fitness scores are supported. Elites use stable ranking, and parent arrays
 are never changed or shared with offspring. Every random operator requires
 an explicit NumPy `Generator`; no global random state is used.
+
+## Evolving controllers
+
+```python
+from neuroevolution import EvolutionConfig, EvolutionRunner, slalom_course
+
+runner = EvolutionRunner(
+    slalom_course(),
+    config=EvolutionConfig(population_size=24, elite_count=2),
+    seed=42,
+)
+for _ in range(5):
+    result = runner.step()
+    print(result.stats.generation, result.stats.best_fitness,
+          result.stats.mean_fitness, result.stats.completion_rate)
+champion = runner.champion
+```
+
+Generation zero evaluates the initial population; each subsequent step breeds
+and evaluates one new generation. Settings stay fixed for a run, and each
+individual receives the same course and episode limit. Population accessors
+and champions return independent controller copies. An optional
+`initial_population` supports controlled comparisons or warm starts.
+
+`runner.history` retains generation statistics. `runner.last_result` includes
+per-agent fitness breakdowns and final episode states. Its champion belongs to
+that generation; `runner.champion` is the best controller seen across the run.
+Elitism preserves best fitness on this deterministic course, while average
+fitness and completion rate can fluctuate. `runner.run(n)` evaluates n more
+generations, preserving the same seeded sequence as n calls to `step()`.
+
+Reproducing a run requires the same seed, course, initial population settings,
+configuration, and NumPy environment. Controller snapshots preserve the actual
+evolved parameters for replay without rerunning evolution.
