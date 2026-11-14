@@ -56,6 +56,9 @@ Development checks:
 .\.venv\Scripts\python.exe -m ruff format --check .
 ```
 
+GitHub Actions runs these checks and the example on every push and pull request.
+The matrix covers Windows and Linux, Python 3.11 and 3.13, and NumPy 1.26 and 2.x.
+
 ## Neural network
 
 ```python
