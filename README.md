@@ -291,3 +291,8 @@ fitness breakdown, and replay trajectory. The demo replays the champion and
 checks that its score matches the recorded best. Reports under `artifacts/`
 are ignored by Git. A short run can improve fitness without solving the course;
 check the recorded completion counts as well as the score.
+
+See [seeded experiment results](docs/EXPERIMENTS.md) for measured baseline
+comparisons and reproduction commands. In the recorded 30-generation seed-19
+run, the first successful controller appeared in generation 20 and the final
+champion reached the goal in 9.60 simulated seconds.

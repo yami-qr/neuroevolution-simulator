@@ -11,8 +11,8 @@ Use a dark lab-style dashboard, as selected during the design discussion.
 The project description supplied as a reference names Python, NumPy,
 Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies.
 The Python engine now includes the NumPy network, course geometry, agents,
-sensors, and bounded episode evaluation. Evolution and the dashboard will
-follow in later milestones.
+sensors, bounded episode evaluation, fitness scoring, and a seeded genetic
+algorithm. The backend, persistence, and dashboard follow in later milestones.
 
 ## Proposed first version
 
@@ -71,8 +71,13 @@ changes should create a new run so results remain interpretable.
    states, fixed-step movement, continuous body collision checks, seven-ray
    observations, ordered checkpoint tracking, and bounded episode evaluation.
    A scripted reference verifies that the default course is traversable.
-3. Implement evolution and demonstrate improvement over an initial population
-   using repeatable experiments.
+3. Complete: implement explainable checkpoint fitness, tournament selection,
+   uniform crossover, Gaussian mutation, elitism, and an incremental seeded
+   generation runner. Three short seeded experiments improved fitness and
+   checkpoint progress over their initial populations. A 30-generation seed-19
+   run evolved a goal-reaching controller; see [experiment results](EXPERIMENTS.md).
+   JSON reports preserve configuration,
+   history, champion parameters, and replay trajectories.
 4. Add FastAPI experiment management and PostgreSQL persistence.
 5. Add the interactive simulation dashboard and result charts.
 6. Add Docker Compose and document a complete local run.
@@ -85,8 +90,9 @@ increments regularly to GitHub.
 ## Decisions to discuss before implementation
 
 - Final dashboard controls, interaction details, and frontend approach.
-- Population defaults, fitness formula, and evolution settings. Current engine
-  defaults are documented in the README and can be configured per experiment.
+- Experiment controls and comparisons for the first release. Current engine
+  and evolution defaults are documented in the README and can be configured
+  per experiment.
 - Which controls and experiment comparisons belong in the first release.
 
 ## Later possibilities
