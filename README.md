@@ -5,8 +5,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-Implementation has started with the Python package foundation. The simulation
-and dashboard are planned features.
+A configurable NumPy feed-forward network is implemented and tested. The
+simulation and dashboard are planned features.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -48,10 +48,30 @@ python -m venv .venv
 On macOS or Linux, use `.venv/bin/python` instead of
 `.\.venv\Scripts\python.exe`.
 
-Development checks, once tests have been added:
+Development checks:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pytest
 .\.venv\Scripts\python.exe -m ruff check .
 .\.venv\Scripts\python.exe -m ruff format --check .
 ```
+
+## Neural network
+
+```python
+import numpy as np
+
+from neuroevolution import FeedForwardNetwork
+
+network = FeedForwardNetwork((10, 12, 2), seed=42)
+actions = network.forward(np.zeros(10))  # One observation: shape (2,).
+batch = network.forward(np.zeros((100, 10)))  # Shared network: shape (100, 2).
+```
+
+Hidden and output layers default to `tanh`; `relu`, `sigmoid`, and `linear` are
+also available. Each layer computes `activation(inputs @ weights + biases)`.
+The example controller has 158 evolvable weights and biases. Initialization
+uses a local seed; inference leaves the network and inputs unchanged.
+
+The batch evaluates many observations using **one network**. A population of
+agents with different genomes will use separate controllers.
