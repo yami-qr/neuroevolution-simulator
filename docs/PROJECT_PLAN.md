@@ -10,8 +10,9 @@ Use a dark lab-style dashboard, as selected during the design discussion.
 
 The project description supplied as a reference names Python, NumPy,
 Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies.
-Implementation is starting with the NumPy neural network in a standalone Python
-package; the simulation and dashboard will follow in later milestones.
+The Python engine now includes the NumPy network, course geometry, agents,
+sensors, and bounded episode evaluation. Evolution and the dashboard will
+follow in later milestones.
 
 ## Proposed first version
 
@@ -66,8 +67,10 @@ changes should create a new run so results remain interpretable.
    parameter serialization. Includes configurable layers and activations,
    seeded initialization, single/batch inference, independent genomes, and
    versioned JSON-compatible snapshots.
-2. Implement deterministic course geometry, movement, sensors, collisions, and
-   episode evaluation.
+2. Complete: implement a fixed slalom course, immutable geometry and agent
+   states, fixed-step movement, continuous body collision checks, seven-ray
+   observations, ordered checkpoint tracking, and bounded episode evaluation.
+   A scripted reference verifies that the default course is traversable.
 3. Implement evolution and demonstrate improvement over an initial population
    using repeatable experiments.
 4. Add FastAPI experiment management and PostgreSQL persistence.
@@ -81,9 +84,9 @@ increments regularly to GitHub.
 
 ## Decisions to discuss before implementation
 
-- The first course layout and agent movement model.
 - Final dashboard controls, interaction details, and frontend approach.
-- Initial population size, network shape, episode length, and fitness formula.
+- Population defaults, fitness formula, and evolution settings. Current engine
+  defaults are documented in the README and can be configured per experiment.
 - Which controls and experiment comparisons belong in the first release.
 
 ## Later possibilities

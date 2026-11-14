@@ -5,8 +5,9 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-Neural controllers, deterministic course geometry, fixed-step movement, and
-sensors are implemented and tested. The dashboard and evolution are planned.
+Neural controllers, deterministic course geometry, fixed-step movement, sensors,
+and bounded controller episodes are implemented and tested. The dashboard and
+evolution are planned.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -56,7 +57,7 @@ Development checks:
 .\.venv\Scripts\python.exe -m ruff format --check .
 ```
 
-GitHub Actions runs these checks and the example on every push and pull request.
+GitHub Actions runs these checks and both examples on every push and pull request.
 The matrix covers Windows and Linux, Python 3.11 and 3.13, and NumPy 1.26 and 2.x.
 
 ## Neural network
@@ -176,3 +177,28 @@ The default observation has ten values, in this order:
 Rays see obstacles and arena boundaries. Agents, the goal, and scoring
 checkpoints do not block them. Checkpoints are not navigation inputs. Custom
 ray fans are supported; their observation size is the ray count plus three.
+
+### Running an episode
+
+```python
+from neuroevolution import run_episode
+
+result = run_episode(course, controller, record=True)
+print(result.final_state.status, result.elapsed_seconds)
+```
+
+Each tick reads sensors, runs the unchanged controller, and applies its action.
+`record=True` retains immutable states for later replay; recording is off by
+default. Elapsed time uses whole simulation ticks, including the final contact
+tick. Running an episode does not train or mutate the controller.
+
+Run the headless course demonstration:
+
+```powershell
+.\.venv\Scripts\python.exe examples/course_demo.py
+```
+
+It shows a scripted reference route through all checkpoints, then evaluates an
+untrained seeded network. The reference demonstrates that the course is
+traversable; it is not a learned solution. Evolution and fitness selection will
+be implemented in the next milestone.
