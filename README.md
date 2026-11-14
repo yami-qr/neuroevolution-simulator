@@ -6,8 +6,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 ## Status
 
 Neural controllers, deterministic course geometry, fixed-step movement, sensors,
-and bounded controller episodes are implemented and tested. The dashboard and
-evolution are planned.
+bounded controller episodes, and fitness scoring are implemented and tested.
+The dashboard and evolution are planned.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -202,3 +202,21 @@ It shows a scripted reference route through all checkpoints, then evaluates an
 untrained seeded network. The reference demonstrates that the course is
 traversable; it is not a learned solution. Evolution and fitness selection will
 be implemented in the next milestone.
+
+## Fitness scoring
+
+`score_episode(course, result)` returns an explainable `FitnessBreakdown`.
+The default score is `1000 * progress + completion_bonus - time_cost - crash_cost`.
+
+- Progress divides the route into ordered checkpoint stages and a final goal
+  stage. Partial progress measures closeness to the next region, relative to
+  spawn or the previous checkpoint, clipped to [0, 1]. Reaching the goal sets
+  full progress, including valid alternate routes that bypass checkpoints.
+- Reaching the goal adds 1000 points. With defaults, any completion outranks
+  any failed attempt, and faster completions score higher.
+- Time costs up to 10 points over the episode limit; crashing costs 25 points.
+- Survival and total distance travelled do not earn points.
+
+`FitnessConfig` exposes the four weights for experiments. Changed weights can
+change the relative ranking of success and failure. Pass the same `AgentConfig`
+used for the episode so tick limits and elapsed time match.
