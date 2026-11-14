@@ -220,3 +220,17 @@ The default score is `1000 * progress + completion_bonus - time_cost - crash_cos
 `FitnessConfig` exposes the four weights for experiments. Changed weights can
 change the relative ranking of success and failure. Pass the same `AgentConfig`
 used for the episode so tick limits and elapsed time match.
+
+## Genetic operators
+
+`breed_population(population, fitness, rng, config=EvolutionConfig())` preserves
+elite controller copies and creates the remaining offspring from selected
+parents. Default settings are 100 individuals, five elites, tournaments of
+three sampled without replacement, an 80% crossover probability per child,
+and independent Gaussian mutation on 10% of genes with standard deviation 0.2.
+Uniform crossover chooses each gene from either parent with equal probability.
+
+All parents must share architecture and activation names. Negative and tied
+fitness scores are supported. Elites use stable ranking, and parent arrays
+are never changed or shared with offspring. Every random operator requires
+an explicit NumPy `Generator`; no global random state is used.

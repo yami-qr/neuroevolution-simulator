@@ -10,6 +10,13 @@ from neuroevolution.agent import (
 from neuroevolution.course import Circle, Course, Rectangle, slalom_course
 from neuroevolution.episode import EpisodeResult, run_episode
 from neuroevolution.fitness import FitnessBreakdown, FitnessConfig, score_episode
+from neuroevolution.genetics import (
+    EvolutionConfig,
+    breed_population,
+    mutate,
+    tournament_select,
+    uniform_crossover,
+)
 from neuroevolution.network import FeedForwardNetwork
 from neuroevolution.sensors import RayReading, SensorConfig, observe, sense
 
@@ -20,6 +27,7 @@ __all__ = [
     "Circle",
     "Course",
     "EpisodeResult",
+    "EvolutionConfig",
     "FeedForwardNetwork",
     "FitnessBreakdown",
     "FitnessConfig",
@@ -27,10 +35,14 @@ __all__ = [
     "RayReading",
     "SensorConfig",
     "observe",
+    "breed_population",
+    "mutate",
     "run_episode",
     "score_episode",
     "sense",
     "slalom_course",
     "spawn_agent",
     "step_agent",
+    "tournament_select",
+    "uniform_crossover",
 ]
