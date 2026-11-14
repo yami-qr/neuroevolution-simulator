@@ -6,6 +6,8 @@ Build a 2D obstacle-course neuroevolution simulator. Agents attempt to reach a
 goal while avoiding obstacles. Build the project in this repository and make
 regular commits. Discuss and agree on implementation scope before coding.
 
+Use a dark lab-style dashboard, as selected during the design discussion.
+
 The project description supplied as a reference names Python, NumPy,
 Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies;
 no application components have been implemented yet.
@@ -38,6 +40,25 @@ no application components have been implemented yet.
 - Export fitness progression charts using Matplotlib.
 - Provide Docker Compose configuration for the application and database.
 
+### Dashboard design
+
+The visual direction is agreed: a dark lab-style interface with neutral
+surfaces, restrained colour, and a clear highlight for the selected agent.
+The simulation arena should be the main focus.
+
+Proposed layout and interactions:
+
+- Top bar: experiment name, course, run status, Start/Pause, and playback speed.
+- Main arena: population, obstacles, goal, optional trails, and sensor rays.
+- Right sidebar: experiment settings and a selected-agent inspector.
+- Below the arena: best and mean fitness, plus goal-completion rate over time.
+- Clicking an agent highlights it and reveals its sensors and movement outputs.
+- A Follow champion option selects the strongest performer automatically.
+- A separate Experiments view holds saved runs and results.
+
+Playback speed should preserve simulation behaviour. Experiment configuration
+changes should create a new run so results remain interpretable.
+
 ## Proposed milestones
 
 1. Implement the NumPy network and verify forward propagation and parameter
@@ -50,12 +71,15 @@ no application components have been implemented yet.
 5. Add the interactive simulation dashboard and result charts.
 6. Add Docker Compose and document a complete local run.
 
-Each milestone should produce reviewable commits and appropriate validation.
+Build each milestone through small, reviewable commits rather than collecting
+the entire application into one commit. Each commit should cover one coherent
+increment. Run the relevant checks before committing, then push completed
+increments regularly to GitHub.
 
 ## Decisions to discuss before implementation
 
 - The first course layout and agent movement model.
-- The interface layout and frontend approach.
+- Final dashboard controls, interaction details, and frontend approach.
 - Initial population size, network shape, episode length, and fitness formula.
 - Which controls and experiment comparisons belong in the first release.
 

@@ -7,8 +7,9 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 Project planning and repository setup. The application has not been implemented.
 
-The obstacle-course setting is agreed. The implementation details in the
-[project plan](docs/PROJECT_PLAN.md) are proposals to review before development.
+The obstacle-course setting and dark lab-style interface are agreed. Remaining
+implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
+to review before development.
 
 ## Project scope
 
@@ -29,8 +30,9 @@ will help explain how changes to evolution settings affect behaviour.
 
 ## Development workflow
 
-Work will be committed regularly in small, meaningful changes. Implementation
-branches will use the `codex/` prefix. Relevant checks will accompany each
-implemented milestone.
+Work will be committed and pushed regularly in small, meaningful changes. Each
+commit will cover a coherent increment, such as network inference, collision
+detection, or a dashboard control. Implementation branches will use the `codex/`
+prefix. Relevant checks will run before committing implemented changes.
 
 Setup and run instructions will be added when the first runnable version exists.
