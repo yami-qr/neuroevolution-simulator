@@ -57,7 +57,7 @@ Development checks:
 .\.venv\Scripts\python.exe -m ruff format --check .
 ```
 
-GitHub Actions runs these checks and both examples on every push and pull request.
+GitHub Actions runs these checks and all three examples on every push and pull request.
 The matrix covers Windows and Linux, Python 3.11 and 3.13, and NumPy 1.26 and 2.x.
 
 ## Neural network
@@ -247,8 +247,12 @@ runner = EvolutionRunner(
 )
 for _ in range(5):
     result = runner.step()
-    print(result.stats.generation, result.stats.best_fitness,
-          result.stats.mean_fitness, result.stats.completion_rate)
+    print(
+        result.stats.generation,
+        result.stats.best_fitness,
+        result.stats.mean_fitness,
+        result.stats.completion_rate,
+    )
 champion = runner.champion
 ```
 
@@ -268,3 +272,22 @@ generations, preserving the same seeded sequence as n calls to `step()`.
 Reproducing a run requires the same seed, course, initial population settings,
 configuration, and NumPy environment. Controller snapshots preserve the actual
 evolved parameters for replay without rerunning evolution.
+
+### Evolution demo and reports
+
+```powershell
+.\.venv\Scripts\python.exe examples/evolution_demo.py --generations 10 --population 24 --seed 42 --output artifacts/evolution-42.json
+```
+
+The demo uses the real slalom course and prints each generation's metrics. Its
+smaller default population of 24 keeps experiments manageable; the engine
+default remains 100. Generation zero is the baseline initial population, so
+ten evaluated generations contain nine breeding cycles. Mutation rate, noise
+scale, and episode step limit are configurable through the demo's arguments.
+
+The optional JSON report records the seed, Python and NumPy versions, complete
+course and configuration, generation history, champion controller snapshot,
+fitness breakdown, and replay trajectory. The demo replays the champion and
+checks that its score matches the recorded best. Reports under `artifacts/`
+are ignored by Git. A short run can improve fitness without solving the course;
+check the recorded completion counts as well as the score.

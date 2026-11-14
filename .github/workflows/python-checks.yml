@@ -48,3 +48,5 @@ jobs:
         run: python examples/network_demo.py
       - name: Run course example
         run: python examples/course_demo.py
+      - name: Run evolution example and export champion
+        run: python examples/evolution_demo.py --generations 3 --population 8 --max-steps 60 --output artifacts/evolution-smoke.json
