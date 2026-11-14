@@ -9,8 +9,9 @@ regular commits. Discuss and agree on implementation scope before coding.
 Use a dark lab-style dashboard, as selected during the design discussion.
 
 The project description supplied as a reference names Python, NumPy,
-Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies;
-no application components have been implemented yet.
+Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies.
+Implementation is starting with the NumPy neural network in a standalone Python
+package; the simulation and dashboard will follow in later milestones.
 
 ## Proposed first version
 

@@ -1,11 +1,12 @@
 # Neuroevolution Simulator
 
-A planned interactive obstacle-course simulator where populations of autonomous
+An obstacle-course simulator in development where populations of autonomous
 agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-Project planning and repository setup. The application has not been implemented.
+Implementation has started with the Python package foundation. The simulation
+and dashboard are planned features.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -35,4 +36,22 @@ commit will cover a coherent increment, such as network inference, collision
 detection, or a dashboard control. Implementation branches will use the `codex/`
 prefix. Relevant checks will run before committing implemented changes.
 
-Setup and run instructions will be added when the first runnable version exists.
+## Development setup
+
+Use Python 3.11 or newer. From the repository root in PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+```
+
+On macOS or Linux, use `.venv/bin/python` instead of
+`.\.venv\Scripts\python.exe`.
+
+Development checks, once tests have been added:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m ruff format --check .
+```
