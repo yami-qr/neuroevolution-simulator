@@ -5,8 +5,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-A configurable NumPy feed-forward network is implemented and tested. The
-simulation and dashboard are planned features.
+A configurable NumPy feed-forward network and deterministic course geometry
+are implemented and tested. Agent behaviour and the dashboard are in development.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -108,3 +108,23 @@ Run the example:
 ```powershell
 .\.venv\Scripts\python.exe examples/network_demo.py
 ```
+
+## Obstacle course
+
+```python
+from neuroevolution import slalom_course
+
+course = slalom_course()
+distance = course.raycast(course.spawn, angle=0, max_distance=200)  # 170 units.
+```
+
+The starting arena is 900 by 600 units, with three staggered walls, a goal, and
+three ordered checkpoint regions. Coordinates use x to the right and y upward;
+headings are in radians, with zero pointing right and positive turns going
+counterclockwise. Courses and their geometry are immutable.
+
+Circular bodies collide on contact with walls or arena boundaries. Movement
+queries sweep the entire segment, including rounded rectangle corners, so thin
+walls cannot be skipped and clear paths beside corners remain usable. Ray
+queries return distance from their origin to the nearest wall or boundary,
+capped at the requested range.
