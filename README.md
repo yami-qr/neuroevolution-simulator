@@ -5,8 +5,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-A configurable NumPy feed-forward network and deterministic course geometry
-are implemented and tested. Agent behaviour and the dashboard are in development.
+Neural controllers, deterministic course geometry, and fixed-step movement are
+implemented and tested. Sensor observations and the dashboard are in development.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -128,3 +128,26 @@ queries sweep the entire segment, including rounded rectangle corners, so thin
 walls cannot be skipped and clear paths beside corners remain usable. Ray
 queries return distance from their origin to the nearest wall or boundary,
 capped at the requested range.
+
+### Agent movement
+
+```python
+from neuroevolution import Action, spawn_agent, step_agent
+
+agent = spawn_agent(course)
+agent = step_agent(course, agent, Action(steering=0, throttle=1))
+```
+
+Defaults are an 8-unit body radius, a maximum speed of 240 units/second, a
+maximum turn rate of pi radians/second, and a fixed 1/60-second timestep. An
+attempt lasts at most 900 steps (15 simulated seconds). Throttle immediately
+sets forward speed, and agents can turn in place. Agents do not collide with
+one another.
+
+`Action` accepts steering in [-1, 1] and throttle in [0, 1].
+`Action.from_network(outputs)` maps two signed outputs to these controls,
+saturating values outside [-1, 1]. Each step returns an immutable state. Goal
+entry, collision, or the time limit ends the attempt; subsequent steps leave a
+terminal state unchanged. Contact events are resolved along the movement
+segment, with collisions winning ties. Checkpoints count only in course order
+along the distance actually travelled before an attempt ends.
