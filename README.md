@@ -5,8 +5,8 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 ## Status
 
-Neural controllers, deterministic course geometry, and fixed-step movement are
-implemented and tested. Sensor observations and the dashboard are in development.
+Neural controllers, deterministic course geometry, fixed-step movement, and
+sensors are implemented and tested. The dashboard and evolution are planned.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -151,3 +151,28 @@ entry, collision, or the time limit ends the attempt; subsequent steps leave a
 terminal state unchanged. Contact events are resolved along the movement
 segment, with collisions winning ties. Checkpoints count only in course order
 along the distance actually travelled before an attempt ends.
+
+### Sensors and controller inputs
+
+```python
+from neuroevolution import FeedForwardNetwork, observe, sense
+
+readings = sense(course, agent)  # Raw distances and endpoints for visualization.
+observation = observe(course, agent)
+controller = FeedForwardNetwork((10, 12, 2), seed=42)
+action = Action.from_network(controller.forward(observation))
+agent = step_agent(course, agent, action)
+```
+
+The default observation has ten values, in this order:
+
+1. Seven wall distances at -90, -60, -30, 0, 30, 60, and 90 degrees relative
+   to the agent's heading, from right to left. Rays start at the body center
+   and measure up to 200 units; values are divided by this range into [0, 1].
+2. Forward and leftward displacement to the final goal, rotated into the
+   agent's frame and divided by the arena diagonal into [-1, 1].
+3. Current speed divided by maximum speed into [0, 1].
+
+Rays see obstacles and arena boundaries. Agents, the goal, and scoring
+checkpoints do not block them. Checkpoints are not navigation inputs. Custom
+ray fans are supported; their observation size is the ray count plus three.

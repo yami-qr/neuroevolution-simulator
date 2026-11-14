@@ -9,6 +9,7 @@ from neuroevolution.agent import (
 )
 from neuroevolution.course import Circle, Course, Rectangle, slalom_course
 from neuroevolution.network import FeedForwardNetwork
+from neuroevolution.sensors import RayReading, SensorConfig, observe, sense
 
 __all__ = [
     "Action",
@@ -18,6 +19,10 @@ __all__ = [
     "Course",
     "FeedForwardNetwork",
     "Rectangle",
+    "RayReading",
+    "SensorConfig",
+    "observe",
+    "sense",
     "slalom_course",
     "spawn_agent",
     "step_agent",
