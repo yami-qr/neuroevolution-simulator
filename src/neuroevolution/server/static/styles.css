@@ -755,6 +755,7 @@
   }
   .chart-tooltip {
     position: absolute;
+    top: 10px;
     pointer-events: none;
     background: #27332d;
     padding: 8px 10px;
