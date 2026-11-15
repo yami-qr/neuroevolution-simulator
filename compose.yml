@@ -1,0 +1,63 @@
+name: neuroevolution
+
+x-application: &application
+  image: neuroevolution-simulator:local
+  build: .
+  environment:
+    DATABASE_URL: postgresql+psycopg://neuroevolution:neuroevolution@postgres:5432/neuroevolution
+  init: true
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: neuroevolution
+      POSTGRES_PASSWORD: neuroevolution
+      POSTGRES_DB: neuroevolution
+    volumes:
+      - lab-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neuroevolution -d neuroevolution"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  migrate:
+    <<: *application
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *application
+    ports:
+      - "127.0.0.1:${LAB_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/ready', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      start_period: 10s
+      retries: 20
+    restart: unless-stopped
+
+  worker:
+    <<: *application
+    command: ["python", "-m", "neuroevolution.server.worker"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    stop_grace_period: 15s
+
+volumes:
+  lab-postgres-data:
