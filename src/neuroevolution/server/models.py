@@ -19,7 +19,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from neuroevolution.server.database import Base, UTCDateTime, utcnow
 
-JSON_VALUE = JSON().with_variant(JSONB(), "postgresql")
+JSON_VALUE = JSON(none_as_null=True).with_variant(
+    JSONB(none_as_null=True), "postgresql"
+)
 
 
 class Experiment(Base):

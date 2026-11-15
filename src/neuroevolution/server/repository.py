@@ -130,6 +130,21 @@ class Repository:
                 )
             return row.champion_replay
 
+    def get_champion(self, identifier: UUID) -> dict:
+        with self.database.sessions() as session:
+            row = self._get(session, Run, identifier)
+            if row.champion is None:
+                raise Conflict("No evaluated champion is available yet.")
+            available = session.scalar(
+                select(Run.champion_replay.is_not(None)).where(Run.id == identifier)
+            )
+            return {
+                "controller": row.champion,
+                "generation": row.champion_generation,
+                "fitness": row.champion_fitness,
+                "replay_available": available,
+            }
+
     def cancel(self, identifier: UUID, *, now: datetime | None = None) -> Run:
         now = now or utcnow()
         with self.database.sessions.begin() as session:
