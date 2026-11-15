@@ -309,7 +309,8 @@ survive API restarts; worker leases retain results after interrupted execution.
 See the [API and PostgreSQL guide](docs/API.md) for startup commands, endpoint
 details, worker operation, and a local SQLite development option. A
 database-only [Compose file](compose.postgres.yml) provisions PostgreSQL 17;
-full application containerization follows in a later milestone.
+the [complete Compose stack](docs/DOCKER.md) also runs the API, dashboard, worker,
+and migrations.
 
 Backend tests run against both isolated SQLite databases and a real PostgreSQL
 service in GitHub Actions.
@@ -327,3 +328,16 @@ Open [Evolution lab](http://127.0.0.1:8000/). For PostgreSQL, configure
 saved results between restarts. See the [dashboard guide](docs/DASHBOARD.md) for
 controls, exports, replay limits, and frontend checks. No Node.js runtime or
 frontend build is needed to use the dashboard.
+
+## Complete Docker stack
+
+With Docker and Compose v2 running, start all services from the repository root:
+
+```powershell
+docker compose up --build --detach --wait
+```
+
+Open [Evolution lab](http://127.0.0.1:8000/). PostgreSQL data survives
+`docker compose down`. See the [Docker guide](docs/DOCKER.md) for ports,
+migrations, upgrades, logs, and persistence checks. The existing
+`compose.postgres.yml` remains available for the database-only development flow.

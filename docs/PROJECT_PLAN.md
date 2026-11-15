@@ -14,7 +14,7 @@ The Python engine now includes the NumPy network, course geometry, agents,
 sensors, bounded episode evaluation, fitness scoring, and a seeded genetic
 algorithm. FastAPI experiment management, PostgreSQL persistence, and standalone
 workers and the dark lab dashboard are implemented. Full application containers
-follow.
+are available through the [complete Compose stack](DOCKER.md).
 
 ## Proposed first version
 
@@ -92,8 +92,10 @@ backend's generation-boundary lifecycle.
    Generation/agent selection, sensor inspection, timed replay, and CSV,
    Matplotlib PNG, and controller JSON exports use persisted data. See the
    [dashboard guide](DASHBOARD.md).
-6. Extend the database-only Compose setup to containerize the API, worker, and
-   dashboard, and document a complete local run.
+6. Complete: package the API, dashboard, and worker in a non-root image. Compose
+   starts PostgreSQL, runs migrations, and gates application startup on readiness.
+   Container lifecycle CI verifies execution, exports, and database persistence
+   after container recreation. See the [Docker guide](DOCKER.md).
 
 Build each milestone through small, reviewable commits rather than collecting
 the entire application into one commit. Each commit should cover one coherent

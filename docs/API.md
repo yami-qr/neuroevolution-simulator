@@ -1,5 +1,9 @@
 # Experiment API and PostgreSQL persistence
 
+To run the API, dashboard, worker, and database together, use the
+[complete Docker Compose guide](DOCKER.md). The instructions below also support
+running Python services on the host with only PostgreSQL in a container.
+
 The API manages immutable experiment definitions and separate execution runs.
 Evolution runs in a standalone worker process. PostgreSQL stores the queue,
 settings, generation metrics, controller snapshots, and champion replays.
