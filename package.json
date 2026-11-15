@@ -1,0 +1,15 @@
+{
+  "name": "neuroevolution-dashboard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/frontend/*.test.js",
+    "format:check": "prettier --check src/neuroevolution/server/static"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "prettier": "3.10.1"
+  }
+}

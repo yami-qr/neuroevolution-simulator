@@ -2,13 +2,15 @@
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated
 from uuid import UUID
 
 from alembic.migration import MigrationContext
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -46,6 +48,12 @@ def create_app(database: Database | None = None) -> FastAPI:
     app = FastAPI(
         title="Neuroevolution Simulator API", version="0.1.0", lifespan=lifespan
     )
+    static = Path(__file__).with_name("static")
+    app.mount("/assets", StaticFiles(directory=static), name="dashboard-assets")
+
+    @app.get("/", include_in_schema=False)
+    def dashboard():
+        return FileResponse(static / "index.html")
 
     @app.exception_handler(NotFound)
     async def not_found(request, error):

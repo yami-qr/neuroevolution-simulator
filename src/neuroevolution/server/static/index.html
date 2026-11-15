@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101516" />
+    <meta
+      name="description"
+      content="A laboratory for evolving neural controllers through obstacle courses."
+    />
+    <title>Neuroevolution — Evolution lab</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script type="module" src="/assets/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to workspace</a>
+    <aside class="sidebar">
+      <a class="brand" href="#simulation" aria-label="Neuroevolution home"
+        ><span class="brand-mark">n<span>·</span></span
+        ><span>Neuroevolution<small>EVOLUTION LAB</small></span></a
+      >
+      <nav aria-label="Workspace">
+        <p class="nav-label">WORKSPACE</p>
+        <a class="nav-item active" href="#simulation" id="nav-simulation"
+          ><span aria-hidden="true">◈</span>Simulation</a
+        ><a class="nav-item" href="#experiments" id="nav-experiments"
+          ><span aria-hidden="true">▤</span>Experiments</a
+        >
+      </nav>
+      <div class="sidebar-note">
+        <span class="tiny-label">THE METHOD</span>
+        <p>Observe. Select.<br />Let the next generation try.</p>
+        <span class="engine-tag">NumPy neural controllers</span>
+      </div>
+      <div class="connection">
+        <span class="status-dot" id="connection-dot"></span>
+        <div>
+          <strong id="connection-label">Connecting</strong
+          ><small>Local workspace</small>
+        </div>
+      </div>
+    </aside>
+    <div class="application">
+      <header class="topbar">
+        <div class="breadcrumb">
+          WORKSPACE <span>/</span>
+          <strong id="breadcrumb-view">SIMULATION</strong>
+        </div>
+        <a class="subtle-link" href="/docs" target="_blank" rel="noreferrer"
+          >API reference ↗</a
+        >
+      </header>
+      <main id="main">
+        <div
+          class="connection-banner"
+          id="connection-banner"
+          role="status"
+          hidden
+        >
+          <span id="connection-message"></span
+          ><button class="button small" id="retry-connection">
+            Retry connection
+          </button>
+        </div>
+        <section id="view-simulation">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">NEURAL CONTROLLERS. NATURAL SELECTION.</p>
+              <h1>Evolution lab<span class="title-dot">.</span></h1>
+              <p class="description">
+                A better way through, one generation at a time.
+              </p>
+            </div>
+            <button class="button primary" data-new-experiment>
+              <span aria-hidden="true">＋</span> New experiment
+            </button>
+          </div>
+          <div class="run-toolbar">
+            <div class="selectors">
+              <label
+                >EXPERIMENT<select id="experiment-select" disabled>
+                  <option value="">Choose an experiment</option>
+                </select></label
+              ><label
+                >RUN<select id="run-select" disabled>
+                  <option value="">No runs yet</option>
+                </select></label
+              >
+            </div>
+            <div class="run-actions">
+              <span class="badge" id="run-status">Ready</span
+              ><button class="button" id="start-run" disabled>
+                Start run <span aria-hidden="true">↗</span></button
+              ><button class="button danger" id="cancel-run" hidden>
+                Cancel run
+              </button>
+            </div>
+          </div>
+          <div class="run-note" id="run-message" aria-live="polite">
+            Create an experiment to begin. Every run keeps its settings and
+            results.
+          </div>
+          <div class="metrics-grid" aria-label="Selected generation metrics">
+            <div class="metric">
+              <span class="metric-label">GENERATION</span
+              ><strong id="metric-generation">—</strong
+              ><span class="metric-context" id="metric-generation-context"
+                >No saved generations</span
+              >
+            </div>
+            <div class="metric">
+              <span class="metric-label">BEST FITNESS</span
+              ><strong id="metric-best">—</strong
+              ><span class="metric-context" id="metric-best-context"
+                >Strongest controller</span
+              >
+            </div>
+            <div class="metric">
+              <span class="metric-label">MEAN FITNESS</span
+              ><strong id="metric-mean">—</strong
+              ><span class="metric-context">Across this population</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">REACHED THE GOAL</span
+              ><strong id="metric-completed">—</strong
+              ><span class="metric-context" id="metric-completion-context"
+                >Successful attempts</span
+              >
+            </div>
+          </div>
+          <div class="workspace-grid">
+            <div class="workspace-main">
+              <section class="panel arena-panel" aria-labelledby="arena-title">
+                <div class="panel-heading">
+                  <div>
+                    <span class="eyebrow">SIMULATION ARENA</span>
+                    <h2 id="arena-title">Slalom course</h2>
+                  </div>
+                  <div class="generation-controls">
+                    <label class="compact-label"
+                      >Generation<select id="generation-select" disabled>
+                        <option value="">—</option>
+                      </select></label
+                    ><label class="check"
+                      ><input id="follow-latest" type="checkbox" checked />
+                      Follow latest</label
+                    >
+                  </div>
+                </div>
+                <div class="arena-wrap">
+                  <canvas
+                    id="arena"
+                    width="900"
+                    height="600"
+                    role="img"
+                    aria-label="Obstacle course, selected agent replay, and population outcomes"
+                  ></canvas>
+                  <div class="arena-empty" id="arena-empty">
+                    <span class="empty-symbol" aria-hidden="true">⌁</span
+                    ><strong>No replay selected</strong
+                    ><span>Save a generation to explore its agents.</span>
+                  </div>
+                  <div class="arena-tooltip" id="arena-tooltip" hidden></div>
+                  <span class="arena-caption" id="arena-caption"
+                    >900 × 600 units</span
+                  >
+                </div>
+                <div class="arena-options">
+                  <div class="legend">
+                    <span
+                      ><i class="legend-dot selected"></i>Selected agent</span
+                    ><span
+                      ><i class="legend-dot population"></i>Population
+                      outcomes</span
+                    >
+                  </div>
+                  <div class="option-group">
+                    <label class="check"
+                      ><input id="show-sensors" type="checkbox" checked />
+                      Sensors</label
+                    ><label class="check"
+                      ><input id="show-trail" type="checkbox" checked />
+                      Trail</label
+                    >
+                  </div>
+                </div>
+                <div class="playback">
+                  <div class="playback-top">
+                    <div class="option-group">
+                      <button class="button small" id="play-replay" disabled>
+                        ▶ Play replay</button
+                      ><select id="playback-speed" aria-label="Replay speed">
+                        <option value="1">1× speed</option>
+                        <option value="5">5× speed</option>
+                        <option value="10">10× speed</option>
+                      </select>
+                    </div>
+                    <span class="mono secondary" id="replay-time"
+                      >0.00s / 0.00s</span
+                    >
+                  </div>
+                  <input
+                    id="replay-scrubber"
+                    type="range"
+                    min="0"
+                    max="1000"
+                    value="0"
+                    aria-label="Replay position"
+                    disabled
+                  />
+                  <div class="playback-caption">
+                    <span id="replay-caption"
+                      >Recorded attempts · playback does not change
+                      training</span
+                    ><span id="replay-outcome"></span>
+                  </div>
+                </div>
+              </section>
+              <div class="charts-grid">
+                <section
+                  class="panel chart-panel"
+                  aria-labelledby="fitness-title"
+                >
+                  <div class="panel-heading">
+                    <div>
+                      <span class="eyebrow">EVOLUTION OVER TIME</span>
+                      <h2 id="fitness-title">Fitness progression</h2>
+                    </div>
+                    <div class="chart-actions">
+                      <button class="text-button" id="export-csv" disabled>
+                        CSV ↓</button
+                      ><button class="text-button" id="export-png" disabled>
+                        PNG ↓
+                      </button>
+                    </div>
+                  </div>
+                  <div class="legend chart-legend">
+                    <span><i class="legend-line best"></i>Best fitness</span
+                    ><span><i class="legend-line mean"></i>Mean fitness</span>
+                  </div>
+                  <div
+                    class="chart-host"
+                    id="fitness-chart"
+                    role="img"
+                    aria-label="Best and mean fitness by generation"
+                  >
+                    <p class="chart-empty">
+                      Your first generation starts the curve.
+                    </p>
+                  </div>
+                </section>
+                <section
+                  class="panel chart-panel"
+                  aria-labelledby="completion-title"
+                >
+                  <div class="panel-heading">
+                    <div>
+                      <span class="eyebrow">FINDING A WAY THROUGH</span>
+                      <h2 id="completion-title">Completion rate</h2>
+                    </div>
+                  </div>
+                  <div class="legend chart-legend">
+                    <span
+                      ><i class="legend-line completion"></i>Agents reaching the
+                      goal</span
+                    >
+                  </div>
+                  <div
+                    class="chart-host"
+                    id="completion-chart"
+                    role="img"
+                    aria-label="Percentage of agents reaching the goal by generation"
+                  >
+                    <p class="chart-empty">
+                      Goal completions will appear here.
+                    </p>
+                  </div>
+                </section>
+              </div>
+              <p class="chart-hint">
+                Select a chart point or generation to inspect a saved
+                population.
+              </p>
+            </div>
+            <aside class="inspector-column">
+              <section class="panel inspector-panel">
+                <div class="panel-heading">
+                  <div>
+                    <span class="eyebrow">UNDER THE HOOD</span>
+                    <h2>Agent inspector</h2>
+                  </div>
+                  <span class="live-mark" aria-hidden="true"></span>
+                </div>
+                <div class="inspector-body">
+                  <label class="agent-picker"
+                    >Selected agent<select id="agent-select" disabled>
+                      <option value="champion">Generation champion</option>
+                    </select></label
+                  >
+                  <div class="agent-summary">
+                    <span class="badge" id="agent-status">Awaiting replay</span
+                    ><span class="mono" id="agent-fitness">—</span>
+                  </div>
+                  <div
+                    class="network-layout"
+                    aria-label="Controller network architecture"
+                  >
+                    <span
+                      ><b id="network-inputs">10</b><small>INPUTS</small></span
+                    ><i aria-hidden="true">→</i
+                    ><span
+                      ><b id="network-hidden">12</b><small>HIDDEN</small></span
+                    ><i aria-hidden="true">→</i
+                    ><span
+                      ><b id="network-outputs">2</b><small>OUTPUTS</small></span
+                    >
+                  </div>
+                  <dl class="readouts">
+                    <div>
+                      <dt>Position</dt>
+                      <dd id="agent-position">—</dd>
+                    </div>
+                    <div>
+                      <dt>Speed</dt>
+                      <dd id="agent-speed">—</dd>
+                    </div>
+                    <div>
+                      <dt>Heading</dt>
+                      <dd id="agent-heading">—</dd>
+                    </div>
+                    <div>
+                      <dt>Checkpoints</dt>
+                      <dd id="agent-checkpoints">—</dd>
+                    </div>
+                  </dl>
+                  <div class="input-header">
+                    <span class="tiny-label">OBSTACLE SENSORS</span
+                    ><span class="tiny-label">R → L</span>
+                  </div>
+                  <div
+                    class="sensor-bars"
+                    id="sensor-bars"
+                    aria-label="Normalized obstacle distances"
+                  ></div>
+                  <div class="output-readouts">
+                    <div>
+                      <span>Steering</span
+                      ><strong id="steering-output">—</strong>
+                    </div>
+                    <div>
+                      <span>Throttle</span
+                      ><strong id="throttle-output">—</strong>
+                    </div>
+                  </div>
+                  <button
+                    class="button full-width"
+                    id="download-controller"
+                    disabled
+                  >
+                    Controller JSON ↓
+                  </button>
+                </div>
+              </section>
+              <section class="panel configuration-panel">
+                <div class="panel-heading">
+                  <div>
+                    <span class="eyebrow">REPRODUCIBLE BY DESIGN</span>
+                    <h2>Run configuration</h2>
+                  </div>
+                </div>
+                <dl
+                  class="readouts configuration-readouts"
+                  id="configuration-readouts"
+                >
+                  <div>
+                    <dt>Population</dt>
+                    <dd>—</dd>
+                  </div>
+                  <div>
+                    <dt>Mutation rate</dt>
+                    <dd>—</dd>
+                  </div>
+                  <div>
+                    <dt>Elites</dt>
+                    <dd>—</dd>
+                  </div>
+                  <div>
+                    <dt>Random seed</dt>
+                    <dd>—</dd>
+                  </div>
+                </dl>
+                <p class="panel-note">Settings stay fixed within a run.</p>
+              </section>
+            </aside>
+          </div>
+        </section>
+        <section id="view-experiments" hidden>
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">YOUR RESEARCH NOTEBOOK</p>
+              <h1>Experiments<span class="title-dot">.</span></h1>
+              <p class="description">
+                Saved settings. Comparable runs. Reproducible results.
+              </p>
+            </div>
+            <button class="button primary" data-new-experiment>
+              ＋ New experiment
+            </button>
+          </div>
+          <section class="panel">
+            <div class="panel-heading">
+              <h2>Experiment library</h2>
+              <span class="secondary" id="experiment-count">0 experiments</span>
+            </div>
+            <div id="experiment-library" class="experiment-library">
+              <div class="library-empty">
+                No experiments yet. Create your first one to begin.
+              </div>
+            </div>
+          </section>
+        </section>
+        <footer class="workspace-footer">
+          <span
+            >NEUROEVOLUTION LAB <span class="footer-divider">/</span> FROM
+            SCRATCH, GENERATION BY GENERATION</span
+          ><span id="workspace-footer-state"
+            >Connected to your local simulator</span
+          >
+        </footer>
+      </main>
+    </div>
+    <dialog id="experiment-dialog">
+      <form id="experiment-form">
+        <div class="dialog-heading">
+          <div>
+            <p class="eyebrow">NEW EXPERIMENT</p>
+            <h2>Set up an experiment</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            id="close-dialog"
+            aria-label="Close experiment dialog"
+          >
+            ×
+          </button>
+        </div>
+        <p class="dialog-description">
+          Choose the conditions. Let evolution find the controller.
+        </p>
+        <label class="form-field"
+          >Experiment name<input
+            id="experiment-name"
+            name="name"
+            required
+            maxlength="120"
+            value="Slalom study"
+            autocomplete="off"
+        /></label>
+        <div class="form-grid">
+          <label class="form-field"
+            >Random seed<input
+              id="new-seed"
+              type="number"
+              min="0"
+              max="4294967295"
+              step="1"
+              value="42"
+              required /></label
+          ><label class="form-field"
+            >Generations<input
+              id="new-generations"
+              type="number"
+              min="1"
+              max="1000"
+              step="1"
+              value="30"
+              required /></label
+          ><label class="form-field"
+            >Population<input
+              id="new-population"
+              type="number"
+              min="2"
+              max="1000"
+              step="1"
+              value="100"
+              required /></label
+          ><label class="form-field"
+            >Episode limit <span>seconds</span
+            ><input
+              id="new-duration"
+              type="number"
+              min="1"
+              max="600"
+              step="1"
+              value="15"
+              required /></label
+          ><label class="form-field"
+            >Mutation rate <span>% of parameters</span
+            ><input
+              id="new-mutation-rate"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value="10"
+              required /></label
+          ><label class="form-field"
+            >Mutation strength<input
+              id="new-mutation-scale"
+              type="number"
+              min="0"
+              max="10"
+              step="0.01"
+              value="0.2"
+              required
+          /></label>
+        </div>
+        <details class="advanced-settings">
+          <summary>Advanced settings</summary>
+          <div class="form-grid">
+            <label class="form-field"
+              >Elites retained<input
+                id="new-elites"
+                type="number"
+                min="0"
+                max="1000"
+                step="1"
+                value="5"
+                required /></label
+            ><label class="form-field"
+              >Tournament size<input
+                id="new-tournament"
+                type="number"
+                min="1"
+                max="1000"
+                step="1"
+                value="3"
+                required /></label
+            ><label class="form-field"
+              >Hidden neurons<input
+                id="new-hidden"
+                type="number"
+                min="1"
+                max="256"
+                step="1"
+                value="12"
+                required
+            /></label>
+          </div>
+        </details>
+        <label class="form-field"
+          >Notes <span>optional</span
+          ><textarea
+            id="new-description"
+            maxlength="2000"
+            rows="2"
+            placeholder="What would you like to compare?"
+          ></textarea>
+        </label>
+        <div class="form-error" id="form-error" role="alert" hidden></div>
+        <div class="dialog-footer">
+          <button class="button" type="submit" name="intent" value="save">
+            Save only</button
+          ><button
+            class="button primary"
+            type="submit"
+            name="intent"
+            value="run"
+          >
+            Create &amp; run ↗
+          </button>
+        </div>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </body>
+</html>
