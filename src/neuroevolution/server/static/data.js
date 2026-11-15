@@ -1,6 +1,6 @@
 // Shared browser data operations. Kept independent of the DOM for Node tests.
 export class ApiClient {
-  constructor(fetcher = globalThis.fetch) {
+  constructor(fetcher = (...args) => globalThis.fetch(...args)) {
     this.fetcher = fetcher;
   }
 

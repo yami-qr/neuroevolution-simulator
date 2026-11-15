@@ -9,6 +9,21 @@ import {
   frameIndex,
 } from "../../src/neuroevolution/server/static/data.js";
 
+test("the default client calls browser fetch with its window receiver", async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = function () {
+    assert.equal(this, globalThis);
+    return Promise.resolve(Response.json({ status: "ready" }));
+  };
+  try {
+    assert.deepEqual(await new ApiClient().request("/ready"), {
+      status: "ready",
+    });
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
 test("pagination preserves filters and consumes every page", async () => {
   const requests = [];
   const client = new ApiClient(async (url) => {

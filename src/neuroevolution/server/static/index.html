@@ -78,11 +78,15 @@
           <div class="run-toolbar">
             <div class="selectors">
               <label
-                >EXPERIMENT<select id="experiment-select" disabled>
+                >EXPERIMENT<select
+                  id="experiment-select"
+                  aria-label="Experiment"
+                  disabled
+                >
                   <option value="">Choose an experiment</option>
                 </select></label
               ><label
-                >RUN<select id="run-select" disabled>
+                >RUN<select id="run-select" aria-label="Run" disabled>
                   <option value="">No runs yet</option>
                 </select></label
               >
@@ -138,7 +142,11 @@
                   </div>
                   <div class="generation-controls">
                     <label class="compact-label"
-                      >Generation<select id="generation-select" disabled>
+                      >Generation<select
+                        id="generation-select"
+                        aria-label="Generation"
+                        disabled
+                      >
                         <option value="">—</option>
                       </select></label
                     ><label class="check"
@@ -293,7 +301,11 @@
                 </div>
                 <div class="inspector-body">
                   <label class="agent-picker"
-                    >Selected agent<select id="agent-select" disabled>
+                    >Selected agent<select
+                      id="agent-select"
+                      aria-label="Selected agent"
+                      disabled
+                    >
                       <option value="champion">Generation champion</option>
                     </select></label
                   >
