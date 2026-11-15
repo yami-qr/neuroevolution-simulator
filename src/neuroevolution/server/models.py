@@ -94,4 +94,7 @@ class Generation(Base):
     champion: Mapped[dict[str, Any]] = mapped_column(JSON_VALUE)
     fitness: Mapped[dict[str, Any]] = mapped_column(JSON_VALUE)
     episode: Mapped[dict[str, Any]] = mapped_column(JSON_VALUE)
+    population: Mapped[list[dict[str, Any]] | None] = mapped_column(
+        JSON_VALUE, deferred=True
+    )
     created_at: Mapped[datetime] = mapped_column(UTCDateTime(), default=utcnow)

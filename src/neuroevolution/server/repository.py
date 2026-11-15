@@ -1,5 +1,6 @@
 """Short database transactions for experiment management and leased run execution."""
 
+from collections.abc import Sequence
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from uuid import UUID, uuid4
@@ -9,6 +10,7 @@ from sqlalchemy.orm import undefer
 
 from neuroevolution._validation import positive_float
 from neuroevolution.evolution import GenerationResult
+from neuroevolution.network import FeedForwardNetwork
 from neuroevolution.server.database import Database, utcnow
 from neuroevolution.server.models import Experiment, Generation, Run
 from neuroevolution.server.schemas import (
@@ -129,6 +131,50 @@ class Repository:
                     "Champion replay is available after the worker finishes."
                 )
             return row.champion_replay
+
+    def generation_source(
+        self, identifier: UUID, generation: int, agent: int | None = None
+    ):
+        with self.database.sessions() as session:
+            run = self._get(session, Run, identifier)
+            saved = session.get(
+                Generation,
+                (identifier, generation),
+                options=[undefer(Generation.population)],
+            )
+            if saved is None:
+                raise NotFound("Generation not found.")
+            population = saved.population or []
+            champion_index = (
+                max(
+                    range(len(population)),
+                    key=lambda index: population[index]["fitness"],
+                )
+                if population
+                else None
+            )
+            selected = champion_index if agent is None else agent
+            if agent is not None and not 0 <= agent < len(population):
+                raise NotFound("Agent not found in the saved population.")
+            if selected is None:
+                controller = saved.champion
+                summary = {
+                    "index": None,
+                    "fitness": saved.best_fitness,
+                    "final_state": saved.episode["final_state"],
+                }
+            else:
+                controller = population[selected]["controller"]
+                summary = {
+                    key: value
+                    for key, value in population[selected].items()
+                    if key != "controller"
+                }
+            outcomes = [
+                {key: value for key, value in entry.items() if key != "controller"}
+                for entry in population
+            ]
+            return run.settings, controller, summary, outcomes, champion_index
 
     def get_champion(self, identifier: UUID) -> dict:
         with self.database.sessions() as session:
@@ -262,6 +308,7 @@ class Repository:
         token: UUID,
         result: GenerationResult,
         *,
+        population: Sequence[FeedForwardNetwork] | None = None,
         now: datetime | None = None,
     ) -> None:
         now = now or utcnow()
@@ -274,11 +321,28 @@ class Repository:
                 raise Conflict("Generations must be saved once, in contiguous order.")
             best = max(range(len(result.scores)), key=lambda i: result.scores[i].total)
             controller = result.champion.to_dict()
+            if population is not None and len(population) != len(result.episodes):
+                raise Conflict("Population snapshots must match the evaluated agents.")
+            snapshots = (
+                None
+                if population is None
+                else [
+                    {
+                        "index": index,
+                        "controller": network.to_dict(),
+                        "fitness": result.scores[index].total,
+                        "progress": result.scores[index].progress,
+                        "final_state": asdict(result.episodes[index].final_state),
+                    }
+                    for index, network in enumerate(population)
+                ]
+            )
             session.add(
                 Generation(
                     run_id=identifier,
                     **asdict(result.stats),
                     champion=controller,
+                    population=snapshots,
                     fitness={
                         **asdict(result.scores[best]),
                         "total": result.scores[best].total,

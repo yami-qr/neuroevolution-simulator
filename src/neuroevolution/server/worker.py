@@ -79,7 +79,9 @@ def run_once(repository: Repository, *, lease_seconds=30, heartbeat_seconds=5):
                     break
                 result = runner.step()
                 heartbeat.check()
-                repository.save_generation(run.id, run.lease_token, result)
+                repository.save_generation(
+                    run.id, run.lease_token, result, population=runner.population
+                )
             replay = None
             if runner.history:
                 episode = run_episode(

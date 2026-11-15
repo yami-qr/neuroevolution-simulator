@@ -2,6 +2,7 @@
 
 import logging
 from contextlib import asynccontextmanager
+from functools import lru_cache
 from pathlib import Path
 from typing import Annotated
 from uuid import UUID
@@ -9,7 +10,7 @@ from uuid import UUID
 from alembic.migration import MigrationContext
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -27,6 +28,7 @@ from neuroevolution.server.schemas import (
     RunCreate,
     RunRead,
 )
+from neuroevolution.server.visuals import fitness_png, generation_replay
 
 logger = logging.getLogger(__name__)
 Offset = Annotated[int, Query(ge=0)]
@@ -37,6 +39,13 @@ HistoryLimit = Annotated[int, Query(ge=1, le=1000)]
 def create_app(database: Database | None = None) -> FastAPI:
     database = database if database is not None else Database()
     repository = Repository(database)
+
+    @lru_cache(maxsize=4)
+    def cached_replay(identifier, generation, agent, max_frames):
+        return generation_replay(
+            repository.generation_source(identifier, generation, agent),
+            max_frames=max_frames,
+        )
 
     @asynccontextmanager
     async def lifespan(app):
@@ -91,7 +100,7 @@ def create_app(database: Database | None = None) -> FastAPI:
         with database.sessions() as session:
             if (
                 MigrationContext.configure(session.connection()).get_current_revision()
-                != "0001"
+                != "0002"
             ):
                 raise HTTPException(503, "Database migrations are pending.")
             session.scalar(select(Run.id).limit(1))
@@ -180,5 +189,37 @@ def create_app(database: Database | None = None) -> FastAPI:
     @app.get("/api/v1/runs/{identifier}/replay", response_model=dict, tags=["Results"])
     def replay(identifier: UUID):
         return repository.get_replay(identifier)
+
+    @app.get(
+        "/api/v1/runs/{identifier}/generations/{generation}/population",
+        tags=["Results"],
+    )
+    def population(identifier: UUID, generation: int):
+        source = repository.generation_source(identifier, generation)
+        return {"agents": source[3], "champion_index": source[4]}
+
+    @app.get(
+        "/api/v1/runs/{identifier}/generations/{generation}/replay", tags=["Results"]
+    )
+    def inspected_replay(
+        identifier: UUID,
+        generation: int,
+        agent: Annotated[int | None, Query(ge=0)] = None,
+        max_frames: Annotated[int, Query(ge=2, le=2000)] = 1200,
+    ):
+        return cached_replay(identifier, generation, agent, max_frames)
+
+    @app.get("/api/v1/runs/{identifier}/fitness.png", tags=["Results"])
+    def export_fitness(identifier: UUID):
+        rows, _ = repository.list_generations(identifier, limit=1000)
+        return Response(
+            fitness_png(rows),
+            media_type="image/png",
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="fitness-{identifier}.png"'
+                )
+            },
+        )
 
     return app
