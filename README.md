@@ -6,8 +6,9 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 ## Status
 
 Neural controllers, deterministic course geometry, fixed-step movement, sensors,
-bounded controller episodes, fitness scoring, and generation evolution are
-implemented and tested. The dashboard is planned.
+bounded controller episodes, fitness scoring, generation evolution, a FastAPI
+experiment service, and PostgreSQL persistence are implemented and tested.
+The dashboard is planned.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -296,3 +297,18 @@ See [seeded experiment results](docs/EXPERIMENTS.md) for measured baseline
 comparisons and reproduction commands. In the recorded 30-generation seed-19
 run, the first successful controller appeared in generation 20 and the final
 champion reached the goal in 9.60 simulated seconds.
+
+## Experiment API
+
+The backend stores experiment configurations, queued execution runs, per-generation
+metrics, evolved controllers, and replay trajectories. A separate worker runs
+evolution while the API handles requests. Run state and completed generations
+survive API restarts; worker leases retain results after interrupted execution.
+
+See the [API and PostgreSQL guide](docs/API.md) for startup commands, endpoint
+details, worker operation, and a local SQLite development option. A
+database-only [Compose file](compose.postgres.yml) provisions PostgreSQL 17;
+full application containerization follows in a later milestone.
+
+Backend tests run against both isolated SQLite databases and a real PostgreSQL
+service in GitHub Actions.

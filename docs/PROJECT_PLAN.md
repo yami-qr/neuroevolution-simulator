@@ -12,7 +12,8 @@ The project description supplied as a reference names Python, NumPy,
 Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies.
 The Python engine now includes the NumPy network, course geometry, agents,
 sensors, bounded episode evaluation, fitness scoring, and a seeded genetic
-algorithm. The backend, persistence, and dashboard follow in later milestones.
+algorithm. FastAPI experiment management, PostgreSQL persistence, and standalone
+workers are implemented. The dashboard and full application containers follow.
 
 ## Proposed first version
 
@@ -78,9 +79,14 @@ changes should create a new run so results remain interpretable.
    run evolved a goal-reaching controller; see [experiment results](EXPERIMENTS.md).
    JSON reports preserve configuration,
    history, champion parameters, and replay trajectories.
-4. Add FastAPI experiment management and PostgreSQL persistence.
+4. Complete: add validated experiment management, a durable run queue, generation
+   metrics and champion replay endpoints, PostgreSQL JSONB storage, and Alembic
+   migrations. Standalone workers use ownership leases, heartbeats, cooperative
+   cancellation, and retained results on failure. Local HTTP/worker/restart
+   checks and PostgreSQL integration CI verify the full lifecycle.
 5. Add the interactive simulation dashboard and result charts.
-6. Add Docker Compose and document a complete local run.
+6. Extend the database-only Compose setup to containerize the API, worker, and
+   dashboard, and document a complete local run.
 
 Build each milestone through small, reviewable commits rather than collecting
 the entire application into one commit. Each commit should cover one coherent
