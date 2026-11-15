@@ -141,6 +141,16 @@ class ExperimentSettings(Schema):
             raise ValueError(
                 "Network must match the sensor input count and have 2 outputs."
             )
+        parameters = sum(
+            (inputs + 1) * outputs
+            for inputs, outputs in zip(
+                self.network.layer_sizes[:-1], self.network.layer_sizes[1:], strict=True
+            )
+        )
+        if parameters * self.evolution.population_size > 5_000_000:
+            raise ValueError(
+                "Controller population exceeds the supported parameter budget."
+            )
         return self
 
     def runner(self) -> EvolutionRunner:

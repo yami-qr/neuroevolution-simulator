@@ -59,6 +59,8 @@ class Database:
             "pool_pre_ping": True,
             "json_serializer": lambda value: json.dumps(value, allow_nan=False),
         }
+        if parsed.get_backend_name() == "postgresql":
+            options["connect_args"] = {"connect_timeout": 5}
         if parsed.get_backend_name() == "sqlite":
             options["connect_args"] = {"check_same_thread": False}
             if parsed.database in (None, "", ":memory:"):

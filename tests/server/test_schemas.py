@@ -42,6 +42,10 @@ def test_valid_settings_build_the_existing_engine():
         {"network": {"layer_sizes": [9, 12, 2]}},
         {"network": {"layer_sizes": [10, 12, 3]}},
         {"agent": {"radius": 100}},
+        {
+            "network": {"layer_sizes": [10, 256, 256, 256, 256, 2]},
+            "evolution": {"population_size": 1000},
+        },
         {"agent": {"max_steps": 0}},
     ],
 )
