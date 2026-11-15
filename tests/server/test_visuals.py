@@ -4,7 +4,11 @@ from fastapi.testclient import TestClient
 
 from neuroevolution.server.api import create_app
 from neuroevolution.server.repository import Repository
-from neuroevolution.server.schemas import ExperimentCreate, RunCreate
+from neuroevolution.server.schemas import (
+    ExperimentCreate,
+    ExperimentSettings,
+    RunCreate,
+)
 from neuroevolution.server.worker import run_once
 
 
@@ -66,3 +70,38 @@ def test_unfinished_runs_have_no_chart_or_population_to_invent(database):
             client.get(f"/api/v1/runs/{run.id}/generations/0/population").status_code
             == 404
         )
+
+
+def test_pre_dashboard_generations_retain_champion_inspection(database):
+    repository = Repository(database)
+    experiment = repository.create_experiment(
+        ExperimentCreate(
+            name="Legacy champion",
+            settings={
+                "generations": 1,
+                "evolution": {
+                    "population_size": 2,
+                    "elite_count": 1,
+                    "tournament_size": 2,
+                },
+                "agent": {"max_steps": 3},
+            },
+        )
+    )
+    queued = repository.create_run(experiment.id, RunCreate())
+    claimed = repository.claim_next()
+    runner = ExperimentSettings.model_validate(claimed.settings).runner()
+    result = runner.step()
+    # The previous worker stored the champion without a population snapshot.
+    repository.save_generation(claimed.id, claimed.lease_token, result)
+    with TestClient(create_app(database)) as client:
+        path = f"/api/v1/runs/{queued.id}/generations/0"
+        assert client.get(path + "/population").json() == {
+            "agents": [],
+            "champion_index": None,
+        }
+        replay = client.get(path + "/replay")
+        assert replay.status_code == 200
+        assert replay.json()["agent"]["index"] is None
+        assert replay.json()["fitness"]["total"] == result.stats.best_fitness
+        assert client.get(path + "/replay?agent=0").status_code == 404

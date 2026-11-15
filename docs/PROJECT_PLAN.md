@@ -13,7 +13,8 @@ Matplotlib, FastAPI, PostgreSQL, and Docker. These are the intended technologies
 The Python engine now includes the NumPy network, course geometry, agents,
 sensors, bounded episode evaluation, fitness scoring, and a seeded genetic
 algorithm. FastAPI experiment management, PostgreSQL persistence, and standalone
-workers are implemented. The dashboard and full application containers follow.
+workers and the dark lab dashboard are implemented. Full application containers
+follow.
 
 ## Proposed first version
 
@@ -51,16 +52,18 @@ The simulation arena should be the main focus.
 
 Proposed layout and interactions:
 
-- Top bar: experiment name, course, run status, Start/Pause, and playback speed.
+- Top bar: experiment and run selection, status, Start run, and Cancel run.
 - Main arena: population, obstacles, goal, optional trails, and sensor rays.
 - Right sidebar: experiment settings and a selected-agent inspector.
 - Below the arena: best and mean fitness, plus goal-completion rate over time.
 - Clicking an agent highlights it and reveals its sensors and movement outputs.
-- A Follow champion option selects the strongest performer automatically.
+- Follow latest selects each saved generation and its champion automatically.
 - A separate Experiments view holds saved runs and results.
 
 Playback speed should preserve simulation behaviour. Experiment configuration
 changes should create a new run so results remain interpretable.
+Pause and speed apply to recorded replay. Training cancellation follows the
+backend's generation-boundary lifecycle.
 
 ## Proposed milestones
 
@@ -84,7 +87,11 @@ changes should create a new run so results remain interpretable.
    migrations. Standalone workers use ownership leases, heartbeats, cooperative
    cancellation, and retained results on failure. Local HTTP/worker/restart
    checks and PostgreSQL integration CI verify the full lifecycle.
-5. Add the interactive simulation dashboard and result charts.
+5. Complete: serve the responsive dark lab dashboard from FastAPI. Experiment
+   controls queue and cancel runs; polling updates fitness/completion charts.
+   Generation/agent selection, sensor inspection, timed replay, and CSV,
+   Matplotlib PNG, and controller JSON exports use persisted data. See the
+   [dashboard guide](DASHBOARD.md).
 6. Extend the database-only Compose setup to containerize the API, worker, and
    dashboard, and document a complete local run.
 
@@ -95,11 +102,11 @@ increments regularly to GitHub.
 
 ## Decisions to discuss before implementation
 
-- Final dashboard controls, interaction details, and frontend approach.
+- Dashboard uses browser-native modules, canvas, and SVG served by FastAPI.
 - Experiment controls and comparisons for the first release. Current engine
   and evolution defaults are documented in the README and can be configured
   per experiment.
-- Which controls and experiment comparisons belong in the first release.
+- Side-by-side experiment comparisons can follow the single-run inspector.
 
 ## Later possibilities
 

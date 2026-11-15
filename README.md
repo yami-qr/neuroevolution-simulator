@@ -7,8 +7,9 @@ agents evolve neural-network controllers to reach a goal and avoid obstacles.
 
 Neural controllers, deterministic course geometry, fixed-step movement, sensors,
 bounded controller episodes, fitness scoring, generation evolution, a FastAPI
-experiment service, and PostgreSQL persistence are implemented and tested.
-The dashboard is planned.
+experiment service, PostgreSQL persistence, and the dark lab dashboard are
+implemented and tested. The dashboard includes agent replay, sensor inspection,
+fitness/completion charts, and result exports.
 
 The obstacle-course setting and dark lab-style interface are agreed. Remaining
 implementation details in the [project plan](docs/PROJECT_PLAN.md) are proposals
@@ -312,3 +313,17 @@ full application containerization follows in a later milestone.
 
 Backend tests run against both isolated SQLite databases and a real PostgreSQL
 service in GitHub Actions.
+
+## Dashboard
+
+Start the API and worker together with an explicit local development database:
+
+```powershell
+.\.venv\Scripts\python.exe -m neuroevolution.server.dev --sqlite
+```
+
+Open [Evolution lab](http://127.0.0.1:8000/). For PostgreSQL, configure
+`DATABASE_URL` and omit `--sqlite`. The launcher applies migrations and retains
+saved results between restarts. See the [dashboard guide](docs/DASHBOARD.md) for
+controls, exports, replay limits, and frontend checks. No Node.js runtime or
+frontend build is needed to use the dashboard.

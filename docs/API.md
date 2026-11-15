@@ -4,6 +4,9 @@ The API manages immutable experiment definitions and separate execution runs.
 Evolution runs in a standalone worker process. PostgreSQL stores the queue,
 settings, generation metrics, controller snapshots, and champion replays.
 
+The [dark lab dashboard](DASHBOARD.md) is served at `/` on the same API address.
+It configures experiments, inspects saved agents, and exports fitness charts.
+
 ## PostgreSQL quick start
 
 Install the project dependencies from the repository root:
