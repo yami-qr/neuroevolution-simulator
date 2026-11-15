@@ -71,7 +71,9 @@ class Run(Base):
     champion: Mapped[dict[str, Any] | None] = mapped_column(JSON_VALUE)
     champion_fitness: Mapped[float | None] = mapped_column(Float)
     champion_generation: Mapped[int | None]
-    champion_replay: Mapped[dict[str, Any] | None] = mapped_column(JSON_VALUE)
+    champion_replay: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON_VALUE, deferred=True
+    )
 
 
 class Generation(Base):
