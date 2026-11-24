@@ -84,16 +84,16 @@ def fitness_png(generations):
         from matplotlib.ticker import MaxNLocator, PercentFormatter
 
         figure = Figure(
-            figsize=(10, 4.8), dpi=150, facecolor="#101516", layout="constrained"
+            figsize=(10, 4.8), dpi=150, facecolor="#0f0e0c", layout="constrained"
         )
         FigureCanvasAgg(figure)
         axis = figure.subplots()
-        axis.set_facecolor("#181e20")
+        axis.set_facecolor("#161512")
         x = [row.generation for row in generations]
         (first,) = axis.plot(
             x,
             [row.best_fitness for row in generations],
-            color="#a2e3ba",
+            color="#ff8a3d",
             label="Best fitness",
             linewidth=2,
             marker="o" if len(x) == 1 else None,
@@ -101,7 +101,7 @@ def fitness_png(generations):
         (second,) = axis.plot(
             x,
             [row.mean_fitness for row in generations],
-            color="#9badcc",
+            color="#b9b1a3",
             label="Mean fitness",
             linewidth=1.5,
             marker="o" if len(x) == 1 else None,
@@ -110,7 +110,7 @@ def fitness_png(generations):
         (third,) = right.plot(
             x,
             [row.completed_count / row.population_size for row in generations],
-            color="#e6c489",
+            color="#7fb6ff",
             label="Completion rate",
             linestyle="--",
             linewidth=1.5,
@@ -119,22 +119,22 @@ def fitness_png(generations):
         right.set_ylim(0, 1.05)
         right.yaxis.set_major_formatter(PercentFormatter(1))
         axis.xaxis.set_major_locator(MaxNLocator(integer=True))
-        axis.set_xlabel("Generation", color="#b1c1b9")
-        axis.set_ylabel("Fitness", color="#b1c1b9")
-        right.set_ylabel("Agents reaching the goal", color="#b1c1b9")
+        axis.set_xlabel("Generation", color="#a39b8d")
+        axis.set_ylabel("Fitness", color="#a39b8d")
+        right.set_ylabel("Agents reaching the goal", color="#a39b8d")
         axis.set_title(
-            "Neuroevolution · Fitness progression", loc="left", color="#edf2f0", pad=18
+            "Neuroevolution · Fitness progression", loc="left", color="#ece6da", pad=18
         )
-        axis.grid(alpha=0.12, color="#899995")
+        axis.grid(alpha=0.12, color="#a39b8d")
         for panel in (axis, right):
-            panel.tick_params(colors="#b1c1b9", labelsize=9)
+            panel.tick_params(colors="#a39b8d", labelsize=9)
             for spine in panel.spines.values():
-                spine.set_color("#34423c")
+                spine.set_color("#3a372f")
         axis.legend(
             handles=[first, second, third],
-            facecolor="#181e20",
-            edgecolor="#34423c",
-            labelcolor="#edf2f0",
+            facecolor="#161512",
+            edgecolor="#3a372f",
+            labelcolor="#ece6da",
             fontsize=8,
             loc="upper left",
         )

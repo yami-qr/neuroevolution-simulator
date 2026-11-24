@@ -84,10 +84,10 @@ export class Chart {
         ),
       );
     const series = completion
-      ? [["completion_rate", "#e6c489"]]
+      ? [["completion_rate", "#7fb6ff"]]
       : [
-          ["mean_fitness", "#9badcc"],
-          ["best_fitness", "#a2e3ba"],
+          ["mean_fitness", "#b9b1a3"],
+          ["best_fitness", "#ff8a3d"],
         ];
     for (const [key, color] of series) {
       const points = rows
@@ -111,7 +111,7 @@ export class Chart {
             cy: y(row[key]),
             r: row.generation === this.selected ? 4 : 2.5,
             fill: color,
-            stroke: "#181e20",
+            stroke: "#161512",
             "stroke-width": 1.5,
           }),
         );
@@ -125,7 +125,7 @@ export class Chart {
           x2: x(selection.generation),
           y1: top,
           y2: height - bottom,
-          stroke: "#899995",
+          stroke: "#a39b8d",
           "stroke-dasharray": "3 5",
           opacity: 0.5,
         }),
@@ -133,7 +133,7 @@ export class Chart {
     const cursor = svgElement("line", {
       y1: top,
       y2: height - bottom,
-      stroke: "#899995",
+      stroke: "#a39b8d",
       opacity: 0,
     });
     svg.append(cursor);
