@@ -1,8 +1,8 @@
 const colors = {
-  mint: "#a2e3ba",
-  gold: "#e6c489",
-  muted: "#657570",
-  red: "#e5a397",
+  signal: "#ff8a3d",
+  goal: "#7fb6ff",
+  muted: "#6f685c",
+  red: "#ff6b5e",
 };
 
 export class Arena {
@@ -103,60 +103,60 @@ export class Arena {
       ctx.fillText(text, x + xOffset, y + yOffset);
     };
     ctx.lineWidth = 1;
-    ctx.strokeStyle = "#1e292b";
+    ctx.strokeStyle = "#1a1916";
     for (let x = 0; x <= course.width; x += Math.max(50, course.width / 30))
-      line([x, 0], [x, course.height], "#1e292b");
+      line([x, 0], [x, course.height], "#1a1916");
     for (let y = 0; y <= course.height; y += Math.max(50, course.height / 20))
-      line([0, y], [course.width, y], "#1e292b");
-    ctx.strokeStyle = "#40504d";
+      line([0, y], [course.width, y], "#1a1916");
+    ctx.strokeStyle = "#3a372f";
     ctx.strokeRect(
       offsetX,
       offsetY,
       course.width * scale,
       course.height * scale,
     );
-    ctx.font = "10px Consolas, monospace";
+    ctx.font = '10px "IBM Plex Mono", Consolas, monospace';
     ctx.textAlign = "center";
     for (const [index, checkpoint] of course.checkpoints.entries()) {
       ctx.setLineDash([3, 5]);
       circle(
         checkpoint.center,
         checkpoint.radius * scale,
-        "#a2e3ba04",
-        "#3c5045",
+        "#ece6da05",
+        "#4a4538",
       );
       ctx.setLineDash([]);
-      label(String(index + 1).padStart(2, "0"), checkpoint.center, "#6a8174");
+      label(String(index + 1).padStart(2, "0"), checkpoint.center, "#7d7566");
     }
     for (const obstacle of course.obstacles) {
       const [x, y] = project([obstacle.x, obstacle.y + obstacle.height]);
-      ctx.fillStyle = "#2b3638";
+      ctx.fillStyle = "#24221d";
       ctx.fillRect(x, y, obstacle.width * scale, obstacle.height * scale);
-      ctx.strokeStyle = "#546060";
+      ctx.strokeStyle = "#4d483d";
       ctx.strokeRect(x, y, obstacle.width * scale, obstacle.height * scale);
     }
     const goal = course.goal;
     circle(
       goal.center,
       Math.max(8, goal.radius * scale),
-      "#e6c48912",
-      colors.gold,
+      "#7fb6ff14",
+      colors.goal,
     );
-    circle(goal.center, 2.5, colors.gold);
+    circle(goal.center, 2.5, colors.goal);
     label(
       "GOAL",
       goal.center,
-      colors.gold,
+      colors.goal,
       0,
       -Math.max(8, goal.radius * scale) - 10,
     );
-    circle(course.spawn, 4, "#a2e3ba20", "#6a8174");
-    label("START", course.spawn, "#81978a", 0, 19);
+    circle(course.spawn, 4, "#ff8a3d20", "#7d7566");
+    label("START", course.spawn, "#8a8274", 0, 19);
     for (const agent of population) {
       circle(
         agent.final_state.position,
         agent.index === replay?.agent.index ? 3 : 2.5,
-        agent.final_state.status === "reached" ? colors.gold : "#82938d80",
+        agent.final_state.status === "reached" ? colors.goal : "#8a827488",
       );
     }
     if (!frame) return;
@@ -168,7 +168,7 @@ export class Arena {
         if (index === 0) ctx.moveTo(...point);
         else ctx.lineTo(...point);
       }
-      ctx.strokeStyle = "#a2e3ba88";
+      ctx.strokeStyle = "#ff8a3d88";
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
@@ -182,22 +182,22 @@ export class Arena {
           state.position[1] + Math.sin(direction) * distance,
         ];
         ctx.lineWidth = 1;
-        line(state.position, end, "#a2e3ba42");
-        circle(end, 1.6, "#a2e3ba99");
+        line(state.position, end, "#ff8a3d42");
+        circle(end, 1.6, "#ff8a3d99");
       });
     }
     const radius = Math.max(5, replay.agent_config.radius * scale);
     const [x, y] = project(state.position);
-    circle(state.position, radius + 5, "#a2e3ba10");
+    circle(state.position, radius + 5, "#ff8a3d18");
     ctx.lineWidth = 1.5;
-    circle(state.position, radius, "#1c3828", colors.mint);
+    circle(state.position, radius, "#2a170a", colors.signal);
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(
       x + Math.cos(state.heading) * (radius + 4),
       y - Math.sin(state.heading) * (radius + 4),
     );
-    ctx.strokeStyle = colors.mint;
+    ctx.strokeStyle = colors.signal;
     ctx.stroke();
   }
 }
